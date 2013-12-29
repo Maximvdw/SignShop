@@ -612,6 +612,9 @@ public class itemUtil {
     public static boolean loadChunkByBlock(Block block) {
         if(block == null)
             return false;
-        return block.getChunk().load();
+        Chunk chunk = block.getChunk();
+        if (!chunk.isLoaded())
+            return block.getChunk().load();
+        return true; // Chunk was already loaded
     }
 }
