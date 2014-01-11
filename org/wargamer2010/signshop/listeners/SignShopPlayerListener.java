@@ -226,6 +226,15 @@ public class SignShopPlayerListener implements Listener {
                 return;
             }
 
+            SignShopArguments ssArgs = new SignShopArguments(economyUtil.parsePrice(sLines[3]), seller.getItems(), seller.getContainables(), seller.getActivatables(),
+                                                                ssPlayer, ssOwner, bClicked, sOperation, event.getBlockFace(), SignShopArgumentsType.Check);
+                                                                
+            SSPreTransactionEvent pretransactevent = SSEventFactory.generatePreTransactionEvent(ssArgs, seller, event.getAction(), bRequirementsOK);
+            SignShop.scheduleEvent(pretransactevent);
+            
+            if(pretransactevent.isCancelled())
+                return;
+                
             for(Block bContainable : seller.getContainables())
                 itemUtil.loadChunkByBlock(bContainable);
             for(Block bActivatable : seller.getActivatables())
@@ -234,8 +243,6 @@ public class SignShopPlayerListener implements Listener {
             if(event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getItem() != null){
                 event.setCancelled(true);
             }
-            SignShopArguments ssArgs = new SignShopArguments(economyUtil.parsePrice(sLines[3]), seller.getItems(), seller.getContainables(), seller.getActivatables(),
-                                                                ssPlayer, ssOwner, bClicked, sOperation, event.getBlockFace(), SignShopArgumentsType.Check);
 
             if(seller.getMisc() != null)
                 ssArgs.miscSettings = seller.getMisc();
@@ -249,11 +256,6 @@ public class SignShopPlayerListener implements Listener {
             }
             if(ssArgs.hasMessagePart("!items") && !ssArgs.hasMessagePart("!price"))
                 signshopUtil.ApplyPriceMod(ssArgs);
-
-            SSPreTransactionEvent pretransactevent = SSEventFactory.generatePreTransactionEvent(ssArgs, seller, event.getAction(), bRequirementsOK);
-            SignShop.scheduleEvent(pretransactevent);
-            if(pretransactevent.isCancelled())
-                return;
 
             if(!bRequirementsOK)
                 return;
